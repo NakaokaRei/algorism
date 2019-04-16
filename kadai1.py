@@ -5,9 +5,10 @@ import copy
 import numpy as np
 
 def nimotu_init():
-    nimotu_list = np.array([(2,21),(10,22),(7,28),(2,21),(4,12),(9,24),(10,15),(7,2),(8,25),(5,28),(3,4),(10,22),
-                            (9,36),(8,2),(8,7),(5,40),(7,14),(3,40),(9,33),(7,21),(2,28),(10,22),(7,14),(9,36),(7,28),
-                            (2,21),(10,18),(4,12),(9,24),(10,15)])
+    nimotu_list = np.array([(9,20),(7,28),(8,2),(2,28),(10,15),(7,28),(7,21),(8,7),(5,28),(4,12),(7,21),(5,4),
+                            (7,31),(5,28),(9,24),(9,36),(9,33),(8,2),(8,25),(2,21),(7,35),(7,14),(9,36),(8,25),(4,12),
+                            (7,14),(3,40),(9,36),(7,2),(7,28),(9,33),(5,40),(10,22),(7,2),(10,18),(10,22),(7,14),(10,22),
+                            (10,15),(10,22),(3,40),(8,7),(3,4),(4,21),(2,21),(2,28),(5,40),(3,4),(9,24),(2,21)])
     omosa = nimotu_list[:,0]
     nedan = nimotu_list[:,1]
     return [omosa,nedan]
@@ -15,7 +16,6 @@ def nimotu_init():
 ##評価関数
 def eval_func(gean):
     omosa,nedan = nimotu_init()
-##    gean = [0,0,1,0,1,1,1,0,1,1]
     vallue = sum(nedan * gean)
     weight = sum(omosa * gean)
     weightmax = 60
@@ -25,14 +25,15 @@ def eval_func(gean):
         vallue = 0
         return vallue
 
-def geneticoptimize(maxiter = 300,maximize = True,popsize = 50,popnum = 30,elite = 0.2,mutprob =0.3):
+def geneticoptimize(maxiter = 30000,maximize = True,popsize = 50,popnum = 50,elite = 0.2,mutprob =0.3,crosprob=0.8):
     """
     maxiter = 1, 繰り返し数
     maximize = True,    スコアを最大化
     popsize = 50,   個体数
-    popnum = 10,    遺伝子数（長さ）
+    popnum = 50,    遺伝子数（長さ）
     elite = 0.2,    生き残る遺伝子の割合
-    mutprob =0.2    突然変異のおこる確立
+    mutprob = 0.3    突然変異のおこる確立
+    crosprob = 0.8  交叉率
     """
     # 突然変異
     def mutate(vec):
@@ -90,7 +91,7 @@ def geneticoptimize(maxiter = 300,maximize = True,popsize = 50,popnum = 30,elite
                 c = random.SystemRandom().randint(0,topelite)
                 pop.append(mutate(ranked[c]))
 
-            else:
+            elif random.SystemRandom().random() < crosprob:
                 # 交叉
                 c1 = random.SystemRandom().randint(0,topelite)
                 c2 = random.SystemRandom().randint(0,topelite)
