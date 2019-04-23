@@ -37,35 +37,41 @@ def geneticoptimize(maxiter = 30000,maximize = True,popsize = 50,popnum = 50,eli
     """
     # 突然変異
     def mutate(vec):
-        i = random.SystemRandom().randint(0,popnum-1)
+        i = random.randint(0,popnum-1)
         if vec[i] == 0:
             return vec[:i] + [1]+vec[i+1:]
         else:
             return vec[:i] + [0]+vec[i+1:]
      # 1点交叉 非推奨
     def one_point_crossover(r1,r2):
-        i = random.SystemRandom().randint(1,popnum-2)
+        i = random.randint(1,popnum-2)
 
-        return random.SystemRandom().choice((r1[0:i] + r2[i:], r2[0:i] + r1[i:]))
+        return random.choice((r1[0:i] + r2[i:], r2[0:i] + r1[i:]))
 
     # 2点交叉
     def two_point_crossover(r1,r2):
-        i, j = sorted(random.SystemRandom().sample(range(popnum),2))
-        return random.SystemRandom().choice((r1[0:i] + r2[i:j] + r1[j:] , r2[0:i] + r1[i:j] + r2[j:]))
+        i, j = sorted(random.sample(range(popnum),2))
+        return random.choice((r1[0:i] + r2[i:j] + r1[j:] , r2[0:i] + r1[i:j] + r2[j:]))
 
     # 一様交叉
     def uniform_crossover(r1, r2):
         q1 = copy.copy(r1)
         q2 = copy.copy(r2)
         for i in range(len(r1)):
-            if random.SystemRandom().random() < 0.5:
+            if random.random() < 0.5:
                 q1[i], q2[i] = q2[i], q1[i]
 
-        return random.SystemRandom().choice([q1,q2])
+        return random.choice([q1,q2])
     #遺伝子の初期化
     pop = []
     for i in range(popsize):
-        vec = [random.SystemRandom().randint(0,1) for i in range(popnum)]
+        vec = []
+        for i in range(popsize):
+            if random.random() < 0.8: #0.5にしたらできない（1の確率を減らした）
+                vec.append(0)
+            else:
+                vec.append(1)
+        #vec = [random.randint(0,1) for i in range(popnum)]
         print (vec)
         pop.append(vec)
     #遺伝子の初期化
@@ -86,15 +92,15 @@ def geneticoptimize(maxiter = 30000,maximize = True,popsize = 50,popnum = 50,eli
         pop = ranked[0:topelite]
         # 生き残った遺伝子同士で交叉したり突然変異したり
         while len(pop) < popsize:
-            if random.SystemRandom().random() < mutprob:
+            if random.random() < mutprob:
                 # 突然変異
-                c = random.SystemRandom().randint(0,topelite)
+                c = random.randint(0,topelite)
                 pop.append(mutate(ranked[c]))
 
-            elif random.SystemRandom().random() < crosprob:
+            elif random.random() < crosprob:
                 # 交叉
-                c1 = random.SystemRandom().randint(0,topelite)
-                c2 = random.SystemRandom().randint(0,topelite)
+                c1 = random.randint(0,topelite)
+                c2 = random.randint(0,topelite)
                 pop.append(crossover(ranked[c1],ranked[c2]))
 ##        # 暫定の値を出力
         #print(scores[0][0])
