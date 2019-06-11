@@ -15,18 +15,18 @@ city = [[1150.0, 1760.0], [630.0, 1660.0], [40.0, 2090.0], [750.0, 1100.0],
 
 def individual_init():
     x = list(range(29))
-    x = random.shuffle(x)
+    random.shuffle(x)
     return x
 
 ##評価関数
 def eval_func(gean):
     vallue = 0
     for i in range(len(city)):
-        city1 = gean[i]
-        city2 = gean[i+1]
+        city1 = city[gean[i]]
+        city2 = city[gean[i+1]]
         distance = math.sqrt((city1[0]-city2[0])**2 + (city1[1]-city2[1])**2)
         vallue = vallue + distance
-        if i=(len(city)-1):
+        if i==(len(city)-1):
             city1 = city[i]
             city2 = city[0]
             distance = math.sqrt((city1[0]-city2[0])**2 + (city1[1]-city2[1])**2)
@@ -46,20 +46,45 @@ def mutate(gean):
 
     return gean
 
+def my_index_multi(l, x):
+    return [i for i, _x in enumerate(l) if _x == x]
+
 def PMX(r1, r2):
     child1 = r1
     child2 = r2
+    box1 = [1] * len(city)
+    box2 = [1] * len(city)
     digit1 = random.randint(0, len(city)-2)
     digit2 = random.randint(digit1, len(city)-1)
-    switch = list(range(digit1, digit2+1))
-    child1[switch] = r2[switch]
-    child2[switch] = r1[switch]
+    child1[digit1:digit2] = r2[digit1:digit2]
+    child2[digit1:digit2] = r1[digit1:digit2]
+    for i,j in zip(child1[digit1:digit2], child2[digit1:digit2]):
+        box1[i] = 1
+        box2[j] = 1
+    for i,j in zip(child1, child2):
+        if box1[i] == 0:
+            box1[i] == 1
+        if box2[j] == 0:
+            box2[j] == 1
+    for i in child1[0:digit1-1]:
+        if box1[i] == 0:
+            index = ramdom.choice(my_index_multi(box1, 0))
+            child[i] = index
+            box1[index] = 1
+
+    for i in child1[digit2:len(city)-1]:
+        if box1[i] == 0:
+            index = ramdom.choice(my_index_multi(box1, 0))
+            child[i] = index
+            box1[index] = 1
+
+    return child1
 
 
 
 
 
-def geneticoptimize(maxiter = 30000,maximize = False,popsize = 50,elite = 0.5,mutprob =0.2,crosprob=0.8):
+def geneticoptimize(maxiter = 100,maximize = False,popsize = 50,elite = 0.6,mutprob =0.2,crosprob=0.8):
     """
     maxiter = 1, 繰り返し数
     maximize = True,    スコアを最大化
