@@ -2,6 +2,7 @@ import random #ランダムモジュール
 import math
 import copy
 import numpy as np
+import copy
 
 
 city = [[1150.0, 1760.0], [630.0, 1660.0], [40.0, 2090.0], [750.0, 1100.0],
@@ -50,33 +51,38 @@ def my_index_multi(l, x):
     return [i for i, _x in enumerate(l) if _x == x]
 
 def PMX(r1, r2):
-    child1 = r1
-    child2 = r2
-    box1 = [1] * len(city)
-    box2 = [1] * len(city)
+    child1 = copy.copy(r1)
+    child2 = copy.copy(r2)
+    box1 = [0] * len(city)
+    box2 = [0] * len(city)
     digit1 = random.randint(0, len(city)-2)
     digit2 = random.randint(digit1, len(city)-1)
     child1[digit1:digit2] = r2[digit1:digit2]
     child2[digit1:digit2] = r1[digit1:digit2]
-    for i,j in zip(child1[digit1:digit2], child2[digit1:digit2]):
+    for i in child1[digit1:digit2]:
         box1[i] = 1
-        box2[j] = 1
-    for i,j in zip(child1, child2):
+    for i in child1:
         if box1[i] == 0:
-            box1[i] == 1
-        if box2[j] == 0:
-            box2[j] == 1
-    for i in child1[0:digit1-1]:
-        if box1[i] == 0:
-            index = ramdom.choice(my_index_multi(box1, 0))
-            child[i] = index
+            box1[i] = 1
+    print(box1)
+    for i in range(len(child1[:digit1])):
+        if box1[child1[i]] == 1:
+            index = random.choice(my_index_multi(box1, 0))
+            child1[i] = index
+            box1[index] = 1
+    for i in range(len(child1[digit2+1:])):
+        if box1[child1[digit2+1+i]] == 1:
+            index = random.choice(my_index_multi(box1, 0))
+            child1[digit2+1+i] = index
             box1[index] = 1
 
-    for i in child1[digit2:len(city)-1]:
-        if box1[i] == 0:
-            index = ramdom.choice(my_index_multi(box1, 0))
-            child[i] = index
-            box1[index] = 1
+    # for i in range(len(child1)):
+    #     if box1[child1[i]] == :
+    #         index = random.choice(my_index_multi(box1, 0))
+    #         child1[i] = index
+    #         box1[index] = 1
+
+    # print(box1)
 
     return child1
 
@@ -84,7 +90,7 @@ def PMX(r1, r2):
 
 
 
-def geneticoptimize(maxiter = 100,maximize = False,popsize = 50,elite = 0.6,mutprob =0.2,crosprob=0.8):
+def geneticoptimize(maxiter = 1000,maximize = False,popsize = 50,elite = 0.7,mutprob =0.2,crosprob=0.7):
     """
     maxiter = 1, 繰り返し数
     maximize = True,    スコアを最大化
