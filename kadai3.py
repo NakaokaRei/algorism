@@ -14,6 +14,8 @@ city = [[1150.0, 1760.0], [630.0, 1660.0], [40.0, 2090.0], [750.0, 1100.0],
         [1280.0, 790.0], [490.0, 2130.0], [1460.0, 1420.0], [1260.0, 1910.0],
         [360.0, 1980.0]]
 
+UNASSIGNED = -1
+
 def individual_init():
     x = list(range(29))
     random.shuffle(x)
@@ -50,47 +52,48 @@ def mutate(gean):
 def my_index_multi(l, x):
     return [i for i, _x in enumerate(l) if _x == x]
 
-def PMX(r1, r2):
-    child1 = copy.copy(r1)
-    child2 = copy.copy(r2)
-    box1 = [0] * len(city)
-    box2 = [0] * len(city)
-    digit1 = random.randint(0, len(city)-2)
-    digit2 = random.randint(digit1, len(city)-1)
-    child1[digit1:digit2] = r2[digit1:digit2]
-    child2[digit1:digit2] = r1[digit1:digit2]
-    for i in child1[digit1:digit2]:
-        box1[i] = 1
-    for i in child1:
-        if box1[i] == 0:
-            box1[i] = 1
-    print(box1)
-    for i in range(len(child1[:digit1])):
-        if box1[child1[i]] == 1:
-            index = random.choice(my_index_multi(box1, 0))
-            child1[i] = index
-            box1[index] = 1
-    for i in range(len(child1[digit2+1:])):
-        if box1[child1[digit2+1+i]] == 1:
-            index = random.choice(my_index_multi(box1, 0))
-            child1[digit2+1+i] = index
-            box1[index] = 1
 
-    # for i in range(len(child1)):
-    #     if box1[child1[i]] == :
-    #         index = random.choice(my_index_multi(box1, 0))
-    #         child1[i] = index
-    #         box1[index] = 1
+def PMX(p1, p2):
+    # PMS: Partially-mapped crossover (部分写像交叉)
+    d1 = random.randint(0, len(p1) - 3)
+    d2 = random.randint(d1, len(p1) - 1)
 
-    # print(box1)
+    c1 = [UNASSIGNED] * len(p1)
+    c2 = [UNASSIGNED] * len(p2)
+    c1[d1:d2] = p2[d1:d2]
+    c2[d1:d2] = p1[d1:d2]
 
-    return child1
+    for i in range(len(c1)):
+        if c1[i] is UNASSIGNED and p1[i] not in c1:
+            c1[i] = p1[i]
+        if c2[i] is UNASSIGNED and p2[i] not in c2:
+            c2[i] = p2[i]
+
+    while(1):
+        index1 = my_index(c1, UNASSIGNED)
+        index2 = my_index(c2, UNASSIGNED)
+
+        if is_int(index1) and is_int(index2):
+            c1[index1] = p2[index2]
+            c2[index2] = p1[index1]
+        else:
+            break
+
+    return random.choice([c1, c2])
 
 
+def my_index(list, value):
+    if value in list:
+        return list.index(value)
+    else:
+        return False
 
 
+def is_int(v):
+    return type(v) is int
 
-def geneticoptimize(maxiter = 1000,maximize = False,popsize = 50,elite = 0.7,mutprob =0.2,crosprob=0.7):
+
+def geneticoptimize(maxiter = 100,maximize = False,popsize = 50,elite = 0.7,mutprob =0.2,crosprob=0.7):
     """
     maxiter = 1, 繰り返し数
     maximize = True,    スコアを最大化
